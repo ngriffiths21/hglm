@@ -21,25 +21,27 @@ description:         Please see the README on GitHub at <https://github.com/ngri
 
 dependencies:
 - base >= 4.7 && < 5
+- hmatrix
+
+ghc-options:
+- -Wall
+# - -Werror
+- -Wcompat
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wredundant-constraints
 
 library:
   source-dirs: src
-  ghc-options:
-    - -Wall
-    - -Werror
-    - -Wcompat
-    - -Wincomplete-record-updates
-    - -Wincomplete-uni-patterns
-    - -Wredundant-constraints
-
 
 tests:
-  hglm-test:
+  spec:
     main:                Spec.hs
-    source-dirs:         test
+    source-dirs: 	 test
     ghc-options:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - hspec
     - hglm

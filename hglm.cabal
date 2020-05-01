@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 87d3ab256f413aec4ded17d4d95913253c32470900c11fe9b3040d97be9cda63
+-- hash: e272260fff70dd56648c1a203b6640c1329b9cadf41e8296bb79c36af516832f
 
 name:           hglm
 version:        0.1.0.0
@@ -32,20 +32,23 @@ library
       Paths_hglm
   hs-source-dirs:
       src
-  ghc-options: -Wall -Werror -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
+    , hmatrix
   default-language: Haskell2010
 
-test-suite hglm-test
+test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
       Paths_hglm
   hs-source-dirs:
       test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5
     , hglm
+    , hmatrix
+    , hspec
   default-language: Haskell2010
