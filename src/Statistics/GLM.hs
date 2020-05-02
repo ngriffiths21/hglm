@@ -1,8 +1,9 @@
-module Lib
+module Statistics.GLM
     ( logReg
     ) where
 
 import Numeric.LinearAlgebra hiding ((<>))
+import Data.Vector hiding (Vector,fromList,toList)
 
 eta :: Matrix Double -> Vector Double -> Vector Double
 eta a x = a #> x
@@ -30,4 +31,3 @@ doIteration a b x = (eqleft a x) <\> (eqright a b x)
 
 logReg :: Matrix Double -> Vector Double -> Vector Double -> [Vector Double]
 logReg a b x = x : logReg a b (doIteration a b x) 
-

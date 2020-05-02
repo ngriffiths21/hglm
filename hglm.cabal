@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: e272260fff70dd56648c1a203b6640c1329b9cadf41e8296bb79c36af516832f
+-- hash: 98598c4041110f72729c65a4343fe2860acab05965a2a21bb292e22e24b5883a
 
 name:           hglm
 version:        0.1.0.0
@@ -27,7 +27,7 @@ source-repository head
 
 library
   exposed-modules:
-      Lib
+      Statistics.GLM
   other-modules:
       Paths_hglm
   hs-source-dirs:
@@ -36,6 +36,7 @@ library
   build-depends:
       base >=4.7 && <5
     , hmatrix
+    , vector
   default-language: Haskell2010
 
 test-suite spec
@@ -51,4 +52,5 @@ test-suite spec
     , hglm
     , hmatrix
     , hspec
+    , vector
   default-language: Haskell2010
