@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 98598c4041110f72729c65a4343fe2860acab05965a2a21bb292e22e24b5883a
+-- hash: a23d97b0d90e834a8a88ea9b86b654a4c86a43f705e8e34a1ec9c1c4ee6f038d
 
 name:           hglm
 version:        0.1.0.0
@@ -32,6 +32,7 @@ library
       Paths_hglm
   hs-source-dirs:
       src
+  default-extensions: InstanceSigs NamedFieldPuns
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
   build-depends:
       base >=4.7 && <5
@@ -46,6 +47,7 @@ test-suite spec
       Paths_hglm
   hs-source-dirs:
       test
+  default-extensions: InstanceSigs NamedFieldPuns
   ghc-options: -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       base >=4.7 && <5

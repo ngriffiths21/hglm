@@ -32,6 +32,10 @@ ghc-options:
 - -Wincomplete-uni-patterns
 - -Wredundant-constraints
 
+default-extensions:
+- InstanceSigs
+- NamedFieldPuns
+
 library:
   source-dirs: src
 

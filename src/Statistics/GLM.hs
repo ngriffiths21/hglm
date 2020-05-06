@@ -1,33 +1,47 @@
 module Statistics.GLM
-    ( logReg
+    ( glm
+    , Family ( Logistic )
+    , Iteration ( Iteration )
     ) where
 
 import Numeric.LinearAlgebra hiding ((<>))
-import Data.Vector hiding (Vector,fromList,toList)
 
-eta :: Matrix Double -> Vector Double -> Vector Double
-eta a x = a #> x
+data Family = Logistic
 
-g :: Floating a => a -> a
-g e = 1 / (exp(-e) + 1)
+data Iteration = Iteration { family :: Family
+                           , a :: Matrix Double
+                           , b :: Vector Double
+                           , x :: Vector Double
+                           }
 
-gprime :: Floating a => a -> a
-gprime e = exp(-e) / (exp(-e) + 1)**2
+class RegIteration a where
+  eta :: a -> Vector Double
+  g :: a -> Vector Double
+  gprime :: a -> Vector Double
+  variance :: a -> Vector Double
 
-z :: Floating a => a -> a -> a
-z e b = e + (b - g e) / gprime e
+instance RegIteration Iteration where
+  eta (Iteration Logistic a _ x) = etac a x
+  g (Iteration Logistic a _ x) = 1 / (exp(-(etac a x)) + 1)
+  gprime (Iteration Logistic a _ x) = exp(-(etac a x)) / (exp(-(etac a x)) + 1)**2
+  variance (Iteration Logistic a b x) = g (Iteration Logistic a b x) * (1 - g (Iteration Logistic a b x))
 
-w :: Floating a => a -> a
-w e = (gprime e)**2 / ((g e) * (1 - g e))
+etac a x = a #> x
 
-eqleft :: Matrix Double -> Vector Double -> Matrix Double
-eqleft a x = tr a <> (matrix 1 (toList (w (eta a x))) * a)
+z :: RegIteration i => i -> Vector Double -> Vector Double
+z i b = eta i + (b - g i) / gprime i
 
-eqright :: Matrix Double -> Vector Double -> Vector Double -> Vector Double
-eqright a b x = tr a #> (w (eta a x) * (z (eta a x) b))
+w :: RegIteration i => i -> Vector Double
+w i = gprime i ** 2 / variance i
 
-doIteration :: Matrix Double -> Vector Double -> Vector Double -> Vector Double
-doIteration a b x = (eqleft a x) <\> (eqright a b x)
+eqleft :: Iteration -> Matrix Double
+eqleft i = tr (a i) <> (matrix 1 (toList (w i)) * a i)
 
-logReg :: Matrix Double -> Vector Double -> Vector Double -> [Vector Double]
-logReg a b x = x : logReg a b (doIteration a b x) 
+eqright :: Iteration -> Vector Double -> Vector Double
+eqright i b = tr (a i) #> (w i * z i b)
+
+doIteration :: Iteration -> Vector Double -> Vector Double
+doIteration i b = eqleft i <\> eqright i b
+
+glm :: Family -> Iteration -> [Vector Double]
+glm f Iteration{a, b, x} = x : glm f (Iteration f a b (doIteration (Iteration f a b x) b))
