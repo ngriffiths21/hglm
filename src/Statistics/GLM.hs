@@ -10,7 +10,6 @@ data Family = Logistic
 
 data Iteration = Iteration { family :: Family
                            , a :: Matrix Double
-                           , b :: Vector Double
                            , x :: Vector Double
                            }
 
@@ -21,10 +20,10 @@ class RegIteration a where
   variance :: a -> Vector Double
 
 instance RegIteration Iteration where
-  eta (Iteration Logistic a _ x) = etac a x
-  g (Iteration Logistic a _ x) = 1 / (exp(-(etac a x)) + 1)
-  gprime (Iteration Logistic a _ x) = exp(-(etac a x)) / (exp(-(etac a x)) + 1)**2
-  variance (Iteration Logistic a b x) = g (Iteration Logistic a b x) * (1 - g (Iteration Logistic a b x))
+  eta (Iteration _ a x) = etac a x
+  g (Iteration Logistic a x) = 1 / (exp(-(etac a x)) + 1)
+  gprime (Iteration Logistic a x) = exp(-(etac a x)) / (exp(-(etac a x)) + 1)**2
+  variance (Iteration Logistic a x) = g (Iteration Logistic a x) * (1 - g (Iteration Logistic a x))
 
 etac a x = a #> x
 
@@ -43,5 +42,5 @@ eqright i b = tr (a i) #> (w i * z i b)
 doIteration :: Iteration -> Vector Double -> Vector Double
 doIteration i b = eqleft i <\> eqright i b
 
-glm :: Family -> Iteration -> [Vector Double]
-glm f Iteration{a, b, x} = x : glm f (Iteration f a b (doIteration (Iteration f a b x) b))
+glm :: Iteration -> Vector Double -> [Vector Double]
+glm Iteration{family, a, x} b = x : glm (Iteration family a (doIteration (Iteration family a x) b)) b
