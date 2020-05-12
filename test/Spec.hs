@@ -7,7 +7,7 @@ main :: IO ()
 main = hspec $ do
   describe "logReg" $ do
     it "can perform logistic regression" $ do
-      fmap (truncate . (*10)) (toList (last $ take 5 $ glm (Iteration Logistic testA testX) testB)) `shouldBe` fmap (truncate . (*10)) (toList $ vector [log 8, log 0.25])
+      fmap (truncate . (*10)) (toList (last $ take 5 $ glm logisticReg (Iteration testA testX) testB)) `shouldBe` fmap (truncate . (*10)) (toList $ vector [log 8, log 0.25])
   
 testA :: Matrix Double
 testA = (6><2) [1::Double, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 2]
