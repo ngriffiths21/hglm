@@ -18,12 +18,10 @@ logisticReg = RegFamily g gprime variance
     variance a x = g a x * (1 - g a x)
 
 doIteration :: Matrix Double -> Vector Double -> Vector Double -> RegFamily -> Vector R
-doIteration a x b rf =
-  let gp = gprime rf a x
-      gn = g rf a x
-      var = variance rf a x
-      w = gp ** 2 / var
-      z = a #> x + (b - gn) / gp
+doIteration a x b (RegFamily g gprime variance) =
+  let gp = gprime a x
+      w = gp ** 2 / variance a x
+      z = a #> x + (b - g a x) / gp
       eqleft = tr a <> (matrix 1 (toList w) * a)
       eqright = tr a #> (w * z)
   in eqleft <\> eqright
