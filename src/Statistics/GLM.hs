@@ -1,36 +1,32 @@
 module Statistics.GLM
     ( glm
-    , Iteration ( Iteration )
     , logisticReg
     ) where
 
 import Numeric.LinearAlgebra hiding ((<>))
 
-data Iteration = Iteration { a :: Matrix Double
-                           , x :: Vector Double
-                           }
-
-
-
-data RegFamily = RegFamily { g :: Iteration -> Vector Double
-                           , gprime :: Iteration -> Vector Double
-                           , variance :: Iteration -> Vector Double
+data RegFamily = RegFamily { g :: Matrix Double -> Vector Double -> Vector Double
+                           , gprime :: Matrix Double -> Vector Double -> Vector Double
+                           , variance :: Matrix Double -> Vector Double -> Vector Double
                            }
 
 logisticReg :: RegFamily
 logisticReg = RegFamily g gprime variance
   where
-    g (Iteration a x) = 1 / (exp(-(a #> x)) + 1)
-    gprime (Iteration a x) = exp(-(a #> x)) / (exp(-(a #> x)) + 1)**2
-    variance (Iteration a x) = g (Iteration a x) * (1 - g (Iteration a x))
-  
-doIteration :: RegFamily -> Iteration -> Vector Double -> Vector Double
-doIteration rf i b =
-  let w = gprime rf i ** 2 / variance rf i
-      z = a i #> x i + (b - g rf i) / gprime rf i
-      eqleft = tr (a i) <> (matrix 1 (toList w) * a i)
-      eqright = tr (a i) #> (w * z)
+    g a x = 1 / (exp(-(a #> x)) + 1)
+    gprime a x = exp(-(a #> x)) / (exp(-(a #> x)) + 1)**2
+    variance a x = g a x * (1 - g a x)
+
+doIteration :: Matrix Double -> Vector Double -> Vector Double -> RegFamily -> Vector R
+doIteration a x b rf =
+  let gp = gprime rf a x
+      gn = g rf a x
+      var = variance rf a x
+      w = gp ** 2 / var
+      z = a #> x + (b - gn) / gp
+      eqleft = tr a <> (matrix 1 (toList w) * a)
+      eqright = tr a #> (w * z)
   in eqleft <\> eqright
 
-glm :: RegFamily -> Iteration -> Vector Double -> [Vector Double]
-glm rf Iteration{a, x} b = x : glm rf (Iteration a (doIteration rf (Iteration a x) b)) b
+glm :: RegFamily -> Matrix Double -> Vector Double -> Vector Double -> [Vector Double]
+glm rf a x b = x : glm rf a (doIteration a x b rf) b
